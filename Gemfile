@@ -166,6 +166,7 @@ gem 'aws-sdk-secretsmanager', '~> 1'
 
 # Postgres insights
 gem 'pghero'
+gem 'concurrent-ruby', '1.3.4'
 
 group :test do
   # Rspec helpers
@@ -201,7 +202,7 @@ group :development, :test do
 
   # Factories
   gem 'factory_bot_rails'
-  gem 'faker'
+  gem 'faker', '~> 3.2.1'
 
   # Use for storing credentials and not uploading them to github. Loads ENV variables from .env
   # file in base folder
