@@ -16,10 +16,8 @@ class Note < ApplicationRecord
   validates :title, :content, presence: true
   validates :note_type, presence: true
   enum note_type: { review: 'review', critique: 'critique' }
-
-  # Validación personalizada para el contenido de las reseñas
   validate :validate_review_word_count, if: :review?
-  # Método para contar las palabras en el contenido
+
   def word_count
     content.split(/\s+/).size
   end
