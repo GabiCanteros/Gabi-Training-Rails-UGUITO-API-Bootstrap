@@ -32,3 +32,52 @@ User.all.find_each do |user|
   random_books_amount = [1, 2, 3].sample
   FactoryBot.create_list(:book, random_books_amount, user: user, utility: user.utility)
 end
+
+north_user = north_utility.users.first
+south_user = south_utility.users.first
+
+# CASOS DE TAMAÑOS VARIADOS 
+# Las líneas comentadas no se pueden ejecutar porque no superan la etapa de validación
+
+FactoryBot.create_list(:note, 2, title: '5-word North user review',content: 'this is a magic note', note_type: 'review', user: north_user)
+
+#FactoryBot.create_list(:note, 2, title: '54-word North user review',content: 'word '*54, note_type: 'review', user: north_user)
+
+#FactoryBot.create_list(:note, 2, title: '67-word North user review',content: 'word '*67, note_type: 'review', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '5-word North user critique',content: 'this is a magic note', note_type: 'critique', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '54-word North user critique',content: 'word '*54, note_type: 'critique', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '67-word North user critique',content: 'word '*67, note_type: 'critique', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '110-word North user critique',content: 'word '*110, note_type: 'critique', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '130-word North user critique',content: 'word '*130, note_type: 'critique', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '5-word South user review',content: 'this is a magic note', note_type: 'review', user: south_user)
+
+FactoryBot.create_list(:note, 2, title: '54-word South user review',content: 'word '*54, note_type: 'review', user: south_user)
+
+#FactoryBot.create_list(:note, 2, title: '67-word South user review',content: 'word '*67, note_type: 'review', user: south_user)
+
+FactoryBot.create_list(:note, 2, title: '5-word South user critique',content: 'this is a magic note', note_type: 'critique', user: south_user)
+
+FactoryBot.create_list(:note, 2, title: '54-word South user critique',content: 'word '*54, note_type: 'critique', user: south_user)
+
+FactoryBot.create_list(:note, 2, title: '67-word South user critique',content: 'word '*67, note_type: 'critique', user: south_user)
+
+FactoryBot.create_list(:note, 2, title: '110-word South user critique',content: 'word '*110, note_type: 'critique', user: south_user)
+
+FactoryBot.create_list(:note, 2, title: '130-word South user critique',content: 'word '*130, note_type: 'critique', user: south_user)
+
+
+# CASOS BORDE DE TAMAÑO
+
+FactoryBot.create_list(:note, 2, title: '50-word North user critique',content: 'word '*50, note_type: 'critique', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '100-word North user critique',content: 'word '*100, note_type: 'critique', user: north_user)
+
+FactoryBot.create_list(:note, 2, title: '60-word South user critique',content: 'word '*60, note_type: 'critique', user: south_user)
+
+FactoryBot.create_list(:note, 2, title: '120-word South user critique',content: 'word '*120, note_type: 'critique', user: south_user)
