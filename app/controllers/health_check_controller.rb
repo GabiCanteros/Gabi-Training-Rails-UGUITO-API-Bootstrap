@@ -11,7 +11,6 @@ class HealthCheckController < HealthCheck::HealthCheckController
 
     @utility_response = utility.utility_service.health_check
     return super if @utility_response.code == 200
-    
 
     render_failed_utility_health_check
   end
