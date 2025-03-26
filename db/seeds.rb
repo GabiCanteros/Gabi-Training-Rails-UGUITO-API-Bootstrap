@@ -36,14 +36,7 @@ end
 north_user = north_utility.users.first
 south_user = south_utility.users.first
 
-# CASOS DE TAMAÑOS VARIADOS 
-# Las líneas comentadas no se pueden ejecutar porque no superan la etapa de validación
-
 FactoryBot.create_list(:note, 2, title: '5-word North user review',content: 'this is a magic note', note_type: 'review', user: north_user)
-
-#FactoryBot.create_list(:note, 2, title: '54-word North user review',content: 'word '*54, note_type: 'review', user: north_user)
-
-#FactoryBot.create_list(:note, 2, title: '67-word North user review',content: 'word '*67, note_type: 'review', user: north_user)
 
 FactoryBot.create_list(:note, 2, title: '5-word North user critique',content: 'this is a magic note', note_type: 'critique', user: north_user)
 
@@ -59,8 +52,6 @@ FactoryBot.create_list(:note, 2, title: '5-word South user review',content: 'thi
 
 FactoryBot.create_list(:note, 2, title: '54-word South user review',content: 'word '*54, note_type: 'review', user: south_user)
 
-#FactoryBot.create_list(:note, 2, title: '67-word South user review',content: 'word '*67, note_type: 'review', user: south_user)
-
 FactoryBot.create_list(:note, 2, title: '5-word South user critique',content: 'this is a magic note', note_type: 'critique', user: south_user)
 
 FactoryBot.create_list(:note, 2, title: '54-word South user critique',content: 'word '*54, note_type: 'critique', user: south_user)
@@ -70,9 +61,6 @@ FactoryBot.create_list(:note, 2, title: '67-word South user critique',content: '
 FactoryBot.create_list(:note, 2, title: '110-word South user critique',content: 'word '*110, note_type: 'critique', user: south_user)
 
 FactoryBot.create_list(:note, 2, title: '130-word South user critique',content: 'word '*130, note_type: 'critique', user: south_user)
-
-
-# CASOS BORDE DE TAMAÑO
 
 FactoryBot.create_list(:note, 2, title: '50-word North user critique',content: 'word '*50, note_type: 'critique', user: north_user)
 
