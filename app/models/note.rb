@@ -14,7 +14,32 @@ class Note < ApplicationRecord
   belongs_to :user
 
   validates :title, :content, presence: true
-  validates :note_type, presence: true, inclusion: { in: ['review', 'critique'] }
+  validates :note_type, presence: true
+  enum note_type: { review: 'review', critique: 'critique' }
+  validate :validate_review_word_count, if: :review?
 
+  def word_count
+    content.split(/\s+/).size
+  end
+
+  def content_length
+    case word_count
+    when 0..utility.max_word_short_content
+      'short'
+    when (utility.max_word_short_content + 1)..utility.max_word_medium_content
+      'medium'
+    else
+      'long'
+    end
+  end
+
+  private
+
+  def validate_review_word_count
+    return unless word_count > utility.max_word_valid_review
+    errors.add(:content,
+               I18n.t('activerecord.errors.models.note.attributes.content.review_word_count',
+                      max_word_limit: utility.max_word_valid_review))
+  end
   has_one :utility, through: :user
 end

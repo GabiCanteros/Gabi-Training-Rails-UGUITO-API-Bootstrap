@@ -31,3 +31,10 @@
 
 es:
   hello: "Hola Mundo!"
+  activerecord:
+    errors:
+      models:
+        note:
+          attributes:
+            content:
+              review_word_count: "El contenido de las reseñas no puede exceder de %{max_word_limit} palabras."
