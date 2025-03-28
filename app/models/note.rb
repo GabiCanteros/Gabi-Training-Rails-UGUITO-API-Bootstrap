@@ -16,7 +16,6 @@ class Note < ApplicationRecord
   validates :title, :content, presence: true
   validates :note_type, presence: true
   enum note_type: { review: 'review', critique: 'critique' }
-
   validate :validate_review_word_count, if: :review?
 
   def word_count
