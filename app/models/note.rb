@@ -20,7 +20,6 @@ class Note < ApplicationRecord
   validate :validate_review_word_count, if: :review?
 
   def word_count
-    return 0 if content.blank?
     content.split(/\s+/).size
   end
 
