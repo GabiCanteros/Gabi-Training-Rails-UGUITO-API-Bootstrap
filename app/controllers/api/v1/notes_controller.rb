@@ -19,20 +19,21 @@ module Api
         render json: { error: 'Invalid order parameter. It must be either "asc" or "desc".' },
                status: :unprocessable_entity
       end
+
       def validate_page_params
         if params[:page].present? && !valid_number?(params[:page])
           render json: { error: 'Page must be a positive integer.' }, status: :unprocessable_entity
           return
         end
-    
-        if params[:page_size].present? && !valid_number?(params[:page_size])
-          render json: { error: 'Page size must be a positive integer.' }, status: :unprocessable_entity
-          return
-        end
+
+        return unless params[:page_size].present? && !valid_number?(params[:page_size])
+        render json: { error: 'Page size must be a positive integer.' },
+               status: :unprocessable_entity
+        nil
       end
 
       def valid_number?(value)
-        value.to_i > 0
+        value.to_i.positive?
       end
 
       def notes_filtered
@@ -63,8 +64,6 @@ module Api
       def show_note
         notes.find(params.require(:id))
       end
-
-      
     end
   end
 end
