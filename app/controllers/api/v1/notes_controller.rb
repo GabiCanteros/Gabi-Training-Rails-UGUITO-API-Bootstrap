@@ -1,8 +1,7 @@
 module Api
   module V1
     class NotesController < ApplicationController
-      before_action :validate_order_param, only: [:index]
-      before_action :validate_page_params, only: [:index]
+      before_action :validate_order_param, :validate_page_params, only: [:index]
 
       def index
         render json: notes_filtered, status: :ok, each_serializer: IndexNoteSerializer
@@ -15,21 +14,20 @@ module Api
       private
 
       def validate_order_param
-        return unless params[:order].present? && !%w[asc desc].include?(params[:order])
-        render json: { error: 'Invalid order parameter. It must be either "asc" or "desc".' },
+        return unless order.present? && !%w[asc desc].include?(order)
+        render json: { error: I18n.t('errors.invalid_order_param') },
                status: :unprocessable_entity
       end
 
       def validate_page_params
-        if params[:page].present? && !valid_number?(params[:page])
-          render json: { error: 'Page must be a positive integer.' }, status: :unprocessable_entity
-          return
-        end
+        return render_page_error unless params[:page].present? && valid_number?(params[:page])
 
-        return unless params[:page_size].present? && !valid_number?(params[:page_size])
-        render json: { error: 'Page size must be a positive integer.' },
+        render_page_error unless params[:page_size].present? && valid_number?(params[:page_size])
+      end
+
+      def render_page_error
+        render json: { error: I18n.t('errors.invalid_page_param') },
                status: :unprocessable_entity
-        nil
       end
 
       def valid_number?(value)
@@ -52,13 +50,12 @@ module Api
       end
 
       def params_transformed
-        params.require(%i[page page_size])
         param_mapping = { 'type' => 'note_type' }
         params.transform_keys! { |key| param_mapping[key] || key }
       end
 
       def order
-        params[:order] == 'desc' ? 'desc' : 'asc'
+        @order ||= params[:order] || 'asc'
       end
 
       def show_note
