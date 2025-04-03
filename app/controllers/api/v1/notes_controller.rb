@@ -1,6 +1,7 @@
 module Api
   module V1
     class NotesController < ApplicationController
+      before_action :authenticate_user!
       before_action :validate_order_param, only: [:index]
       before_action :validate_page_params, only: [:index]
 
@@ -44,7 +45,7 @@ module Api
       end
 
       def notes
-        Note.all
+        current_user.notes
       end
 
       def filtering_params
