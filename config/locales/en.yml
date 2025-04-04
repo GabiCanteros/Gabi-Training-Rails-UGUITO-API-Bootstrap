@@ -34,3 +34,4 @@ en:
     review_word_count: "Review content cannot exceed %{max_word_limit} words."
     invalid_order_param: "Invalid order param. Must be 'asc' o 'desc'."
     invalid_page_param: "Page or Page Size invalid or no present.Use a positive integer."
+

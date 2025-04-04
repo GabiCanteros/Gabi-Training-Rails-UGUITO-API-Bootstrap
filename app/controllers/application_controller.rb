@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
                                  .add_error(identifier, message: message, meta: meta)
     render json: errors, status: errors.status
   end
-  
+
   def utility
     raise ActionController::ParameterMissing, 'Utility-ID header' if utility_code_header.nil?
     utility_code = sanitized_utility_code(utility_code_header)
