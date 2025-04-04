@@ -4,7 +4,7 @@ module Api
       before_action :authenticate_user!
 
       def current
-        render json: current_user, status: :ok, serializer: UserSerializer
+        render json: current_user, status: :ok, serializer: UserSerializer 
       end
     end
   end
