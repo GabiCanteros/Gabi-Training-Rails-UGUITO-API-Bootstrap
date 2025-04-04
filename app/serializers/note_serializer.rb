@@ -3,3 +3,4 @@ class NoteSerializer < ActiveModel::Serializer
   attribute :note_type, key: :type
   belongs_to :user, serializer: UserSerializer
 end
+
