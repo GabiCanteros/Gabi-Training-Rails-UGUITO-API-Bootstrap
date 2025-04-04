@@ -12,6 +12,12 @@ class ApplicationController < ActionController::Base
     @utility_code_header ||= request.headers['Utility-ID']
   end
 
+  def render_error(identifier, message: nil, meta: nil, status: :bad_request, utility: nil)
+    errors = ErrorResponseBuilder.new(status, utility)
+                                 .add_error(identifier, message: message, meta: meta)
+    render json: errors, status: errors.status
+  end
+  
   def utility
     raise ActionController::ParameterMissing, 'Utility-ID header' if utility_code_header.nil?
     utility_code = sanitized_utility_code(utility_code_header)
