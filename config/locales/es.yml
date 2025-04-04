@@ -32,5 +32,5 @@
 es:
   errors:
     review_word_count: "El contenido de las reseñas no puede exceder de %{max_word_limit} palabras."
-    invalid_order_param: "El parámetro de orden es inválido. Debe ser 'asc' o 'desc'."
+    invalid_order_param: "El parámetro de orden es inválido. Debe ser asc o desc."
     invalid_page_param: "Página o tamaño de página inválidos o no presentes. Usa un número entero positivo."
