@@ -30,7 +30,20 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 es:
-  errors:
-    review_word_count: "El contenido de las reseñas no puede exceder de %{max_word_limit} palabras."
-    invalid_order_param: "El parámetro de orden es inválido. Debe ser 'asc' o 'desc'."
-    invalid_page_param: "Página o tamaño de página inválidos o no presentes. Usa un número entero positivo."
+  activerecord:
+    errors:
+      controllers:
+        api:
+          v1:
+            notes_controller:
+              invalid_order_param: "El parámetro de orden es inválido. Debe ser asc o desc."
+              invalid_page_param: "Página o tamaño de página inválidos o no presentes. Usa un número entero positivo."
+              review_word_count: "Una reseña no puede superar las %{max_word_limit} palabras."
+              params_missing: "Faltan parametros requeridos."
+              invalid_note_type: "El tipo de nota no es válido."
+      models:
+        note:
+          attributes:
+            content:
+              review_word_count: "Una reseña no puede superar las %{max_word_limit} palabras."
+    
