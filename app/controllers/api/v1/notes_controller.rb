@@ -45,7 +45,10 @@ module Api
       end
 
       def validate_review_word_count
-        return unless word_count > current_user.utility.max_word_valid_review
+        unless word_count > current_user.utility.max_word_valid_review &&
+               params[:note][:note_type] == 'review'
+          return
+        end
         render json: { error:
         I18n.t('activerecord.errors.controllers.api.v1.notes_controller.review_word_count',
                max_word_limit: current_user.utility.max_word_valid_review) },
