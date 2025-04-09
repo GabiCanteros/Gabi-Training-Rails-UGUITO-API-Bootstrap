@@ -12,113 +12,110 @@ describe Api::V1::NotesController, type: :controller do
                                                           serializer: IndexNoteSerializer).to_json
       end
       let(:notes_expected) { user_notes }
+      let(:page) { 1 }
+      let(:page_size) { 50 }
 
-      context 'when fetching all the notes for user' do
-        let(:notes_expected) { user_notes }
-
-        before { get :index, params: { page: 1, page_size: 50 } }
-
-        it 'responds with the expected notes json' do
-          expect(response_body.to_json).to eq(expected)
-        end
-
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
-      end
-
-      context 'when fetching notes with page and page size params' do
-        let(:page)            { 1 }
-        let(:page_size)       { 2 }
-        let(:notes_expected) { user_notes.first(2) }
-
+      context 'when page and page_size are params' do
         before { get :index, params: { page: page, page_size: page_size } }
 
-        it 'responds with the expected notes' do
-          expect(response_body.to_json).to eq(expected)
+        context 'when fetching all the notes for user' do
+          it_behaves_like 'good responses'
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
-      end
+        context 'when page is invalid' do
+          let(:page) { 0 }
+          let(:page_size) { 10 }
 
-      context 'when fetching notes using filters' do
-        let(:type) { 'review' }
+          it 'responds with Unprocessable Entity status' do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
 
-        let!(:notes_custom) { create_list(:note, 2, user: user, note_type: type) }
-        let(:notes_expected) { notes_custom }
-
-        before { get :index, params: { page: 1, page_size: 50, type: type } }
-
-        it 'responds with expected notes' do
-          expect(response_body.to_json).to eq(expected)
+          it 'responds with an error message for invalid page' do
+            expect(response.body).to include(I18n.t('errors.invalid_page_param'))
+          end
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
-      end
+        context 'when page_size is invalid' do
+          let(:page) { 1 }
+          let(:page_size) { Faker::Lorem.word }
 
-      context 'when order is valid' do
-        let(:order) { 'asc' }
+          it 'responds with Unprocessable Entity status' do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
 
-        let(:user_notes_order) { user_notes.sort_by { |i_note| i_note[:created_at] } }
-
-        let(:notes_expected) { user_notes_order }
-
-        before { get :index, params: { page: 1, page_size: 50, order: order } }
-
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
+          it 'responds with an error message for invalid page_size' do
+            expect(response.body).to include(I18n.t('errors.invalid_page_param'))
+          end
         end
 
-        it 'responds with expected notes' do
-          expect(response_body.to_json).to eq(expected)
-        end
-      end
+        context 'when fetching notes and page_size = 2 ' do
+          let(:page_size) { 2 }
+          let(:total_pages) { user_notes.size.div(page_size) }
+          let(:page) { (1..total_pages).to_a.sample }
+          let(:size_expected) { page_size % page == 0 ? page_size : (notes_expected.size % page_size) }
 
-      context 'when order is invalid' do
-        let(:order) { 'hola' }
+          it 'responds with the expected first note' do
+            expect(response_body.first).to eq(JSON.parse(expected)[page * page_size - page_size])
+          end
 
-        before { get :index, params: { page: 1, page_size: 10, order: order } }
+          it 'responds with the expected page size' do
+            expect(response_body.size).to eq(size_expected)
+          end
 
-        it 'responds with Unprocessable Entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
-        end
-
-        it 'responds with a correct error message' do
-          expect(response.body).to include('El parámetro de orden es inválido. Debe ser asc o desc.')
+          it 'responds with 200 status' do
+            expect(response).to have_http_status(:ok)
+          end
         end
       end
 
-      context 'when page is invalid' do
-        let(:page) { 0 }
-        let(:page_size) { 10 }
+      context 'when page, page_size and type are params' do
+        before { get :index, params: { page: page, page_size: page_size, type: type } }
 
-        before { get :index, params: { page: page, page_size: page_size } }
+        context 'when fetching notes using filters' do
+          let(:type) { 'review' }
+          let(:page) { 1 }
+          let(:page_size) { 50 }
+          let!(:notes_custom) { create_list(:note, 2, user: user, note_type: type) }
+          let(:notes_expected) { notes_custom }
 
-        it 'responds with Unprocessable Entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
-        end
-
-        it 'responds with an error message for invalid page' do
-          expect(response.body).to include('Página o tamaño de página inválidos o no presentes. Usa un número entero positivo.')
+          it_behaves_like 'good responses'
         end
       end
 
-      context 'when page_size is invalid' do
+      context 'when page, page_size and order are params' do
+        before { get :index, params: { page: page, page_size: page_size, order: order } }
+
         let(:page) { 1 }
-        let(:page_size) { 'a' }
+        let(:page_size) { 50 }
 
-        before { get :index, params: { page: page, page_size: page_size } }
+        context 'when order is valid' do
+          let(:user_notes_order_asc) { user_notes.sort_by { |i_note| i_note[:created_at] } }
 
-        it 'responds with Unprocessable Entity status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+          context 'when is asc' do
+            let(:order) { 'asc' }
+            let(:notes_expected) { user_notes_order_asc }
+
+            it_behaves_like 'good responses'
+          end
+
+          context 'when is desc' do
+            let(:order) { 'desc' }
+            let(:notes_expected) { user_notes_order_asc.reverse }
+
+            it_behaves_like 'good responses'
+          end
         end
 
-        it 'responds with an error message for invalid page_size' do
-          expect(response.body).to include('Página o tamaño de página inválidos o no presentes. Usa un número entero positivo.')
+        context 'when order is invalid' do
+          let(:order) { Faker::Lorem.word }
+
+          it 'responds with Unprocessable Entity status' do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'responds with a correct error message' do
+            expect(response.body).to include(I18n.t('errors.invalid_order_param'))
+          end
         end
       end
 
@@ -171,13 +168,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :show, params: { id: note.id } }
 
-        it 'responds with the note json' do
-          expect(response.body).to eq(expected)
-        end
-
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'good responses'
       end
 
       context 'when fetching a invalid note' do
