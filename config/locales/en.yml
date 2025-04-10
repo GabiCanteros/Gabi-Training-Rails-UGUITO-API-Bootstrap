@@ -32,18 +32,21 @@
 en:
   activerecord:
     errors:
-      controllers:
-          api:
-            v1:
-              notes_controller:
-              invalid_order_param: "Invalid order param. Must be asc or desc."
-              invalid_page_param: "Page or Page Size invalid or not present. Use a positive integer."
-              review_word_count: "Review content cannot exceed %{max_word_limit} words."
-              params_missing: "Required parameters are missing."
-              invalid_note_type: "Note type invalid."
       models:
         note:
           attributes:
             content:
               review_word_count: "Review content cannot exceed %{max_word_limit} words."
-    
+
+  controllers:
+    errors:
+      api:
+        v1:
+          notes_controller:
+            invalid_order_param: "Invalid order param. Must be asc or desc."
+            invalid_page_param: "Page or Page Size invalid or not present. Use a positive integer."
+            review_word_count: "Review content cannot exceed %{max_word_limit} words."
+            params_missing: "Required parameters are missing."
+            invalid_note_type: "Note type invalid."
+            success_note_create: "Note created with success"
+              

@@ -3,8 +3,9 @@ module Api
     class NotesController < ApplicationController
       before_action :authenticate_user!
       before_action :validate_order_param, :validate_page_params, only: [:index]
-      before_action :transform_params, :validate_required_params, :validate_note_type,
-                    :validate_review_word_count, only: [:create]
+      rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
+      rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
+      rescue_from ArgumentError, with: :handle_argument_error
 
       def index
         render json: notes_filtered, status: :ok, each_serializer: IndexNoteSerializer
@@ -15,66 +16,52 @@ module Api
       end
 
       def create
-        Note.create!(note_params_with_references)
-        render json: { message: 'Nota creada con éxito.' }, status: :created
+        params_transformed
+        current_user.notes.create!(note_params)
+        render json: { message:
+              I18n.t('controllers.errors.api.v1.notes_controller.success_note_create') },
+               status: :created
       end
 
       private
 
-      def transform_params
-        return unless params[:note] && params[:note][:type]
-        params[:note][:note_type] = params[:note].delete(:type)
-      end
-
-      def validate_required_params
-        required_params = %i[title note_type content]
-        missing_params = required_params.select { |param| params[:note][param].blank? }
-
-        return unless missing_params.any?
-        render json:
-        { error:
-        I18n.t('activerecord.errors.controllers.api.v1.notes_controller.params_missing') },
-               status: :bad_request
-      end
-
-      def validate_note_type
-        return if Note.note_types.keys.include?(params[:note][:note_type])
-        render json: { error:
-        I18n.t('activerecord.errors.controllers.api.v1.notes_controller.invalid_note_type') },
-               status: :unprocessable_entity
-      end
-
-      def validate_review_word_count
-        unless word_count > current_user.utility.max_word_valid_review &&
-               params[:note][:note_type] == 'review'
-          return
-        end
-        render json: { error:
-        I18n.t('activerecord.errors.controllers.api.v1.notes_controller.review_word_count',
-               max_word_limit: current_user.utility.max_word_valid_review) },
-               status: :unprocessable_entity
-      end
-
-      def word_count
-        params[:note][:content].split(/\s+/).size
-      end
-
-      def note_params_with_references
-        note_params.merge(user_id: current_user.id)
-      end
-
-      def note_params
-        params.require(:note).permit(:note_type, :title, :content, :user_id)
+      def handle_record_invalid(exception)
+        error_messages = remake_error_message(exception)
+        render json: { error: error_messages }, status: :unprocessable_entity
       end
 
       def remake_error_message(message)
         message.record.errors.full_messages.map { |msg| msg.split(' ', 2).last }.join(', ')
       end
 
+      def handle_parameter_missing(_exception)
+        render json: { error:
+              I18n.t('controllers.errors.api.v1.notes_controller.params_missing') },
+               status: :bad_request
+      end
+
+      def handle_argument_error(_exception)
+        render json: { error:
+              I18n.t('controllers.errors.api.v1.notes_controller.invalid_note_type') },
+               status: :unprocessable_entity
+      end
+
+      def params_transformed
+        param_mapping = { 'type' => 'note_type' }
+        params.deep_transform_keys! do |key|
+          param_mapping[key.to_s] || key
+        end
+      end
+
+      def note_params
+        params.require(:note).require(%i[title note_type content])
+        params.require(:note).permit(:title, :note_type, :content)
+      end
+
       def validate_order_param
         return unless order.present? && !%w[asc desc].include?(order)
         render json: { error:
-        I18n.t('activerecord.errors.controllers.api.v1.notes_controller.invalid_order_param') },
+        I18n.t('controllers.errors.api.v1.notes_controller.invalid_order_param') },
                status: :unprocessable_entity
       end
 
@@ -84,13 +71,12 @@ module Api
 
       def validate_page_params
         return render_page_error unless params[:page].present? && valid_number?(params[:page])
-
         render_page_error unless params[:page_size].present? && valid_number?(params[:page_size])
       end
 
       def render_page_error
         render json: { error:
-        I18n.t('activerecord.errors.controllers.api.v1.notes_controller.invalid_page_param') },
+        I18n.t('controllers.errors.api.v1.notes_controller.invalid_page_param') },
                status: :unprocessable_entity
       end
 
@@ -107,11 +93,6 @@ module Api
 
       def filtering_params
         params_transformed.permit(%i[note_type title])
-      end
-
-      def params_transformed
-        param_mapping = { 'type' => 'note_type' }
-        params.transform_keys! { |key| param_mapping[key] || key }
       end
 
       def show_note
