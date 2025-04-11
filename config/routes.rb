@@ -13,7 +13,11 @@ Rails.application.routes.draw do
                         sessions: 'api/v1/users/sessions',
                         registrations: 'api/v1/users/registrations'
                        }
-    resources :notes, only: %i[index show]
+    resources :notes, only: %i[index show] do
+      collection do
+      get :async, to: 'notes#index_async'
+      end
+    end  
     resources :books, only: %i[index show] do
       collection do
         get :async, to: 'books#index_async'
@@ -105,6 +109,7 @@ end
 #                                    PUT        /api/v1/users(.:format)                                                                           api/v1/users/registrations#update {:format=>:json}
 #                                    DELETE     /api/v1/users(.:format)                                                                           api/v1/users/registrations#destroy {:format=>:json}
 #                                    POST       /api/v1/users(.:format)                                                                           api/v1/users/registrations#create {:format=>:json}
+#                 async_api_v1_notes GET        /api/v1/notes/async(.:format)                                                                     api/v1/notes#index_async {:format=>:json}
 #                       api_v1_notes GET        /api/v1/notes(.:format)                                                                           api/v1/notes#index {:format=>:json}
 #                        api_v1_note GET        /api/v1/notes/:id(.:format)                                                                       api/v1/notes#show {:format=>:json}
 #                 async_api_v1_books GET        /api/v1/books/async(.:format)                                                                     api/v1/books#index_async {:format=>:json}

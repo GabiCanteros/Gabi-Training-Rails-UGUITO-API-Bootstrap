@@ -5,6 +5,9 @@ module UtilityService
         { books: map_books(response_body['libros']) }
       end
 
+      def retrieve_notes(_response_code, response_body)
+        { notes: map_books(response_body['notas']) }
+      end
       private
 
       def map_books(books)
@@ -20,6 +23,7 @@ module UtilityService
           }
         end
       end
+      
     end
   end
 end

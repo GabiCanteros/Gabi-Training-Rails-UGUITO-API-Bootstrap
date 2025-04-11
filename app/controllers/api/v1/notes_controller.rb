@@ -12,7 +12,15 @@ module Api
         render json: show_note, status: :ok
       end
 
+      def index_async
+        response = execute_async(RetrieveNotesWorker, current_user.id, index_async_params)
+        async_custom_response(response)
+      end
       private
+
+      def index_async_params
+        { author: params.require(:author) } #chequear cuales son
+      end
 
       def validate_order_param
         return unless order.present? && !%w[asc desc].include?(order)
@@ -52,6 +60,7 @@ module Api
 
       def params_transformed
         param_mapping = { 'type' => 'note_type' }
+        param_mapping = { 'autor' => 'author' }
         params.transform_keys! { |key| param_mapping[key] || key }
       end
 
