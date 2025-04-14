@@ -55,7 +55,7 @@ module Api
 
       def note_params
         params.require(:note).require(%i[title note_type content])
-        params.require(:note).permit(:title, :note_type, :content)
+        params.require(:note).permit(%i[title note_type content])
       end
 
       def validate_order_param
