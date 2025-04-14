@@ -19,7 +19,7 @@ describe Api::V1::NotesController, type: :controller do
         before { get :index, params: { page: page, page_size: page_size } }
 
         context 'when fetching all the notes for user' do
-          it_behaves_like 'good responses'
+          it_behaves_like 'success index notes responses'
         end
 
         context 'when page is invalid' do
@@ -38,7 +38,6 @@ describe Api::V1::NotesController, type: :controller do
         context 'when page_size is invalid' do
           let(:page) { 1 }
           let(:page_size) { Faker::Lorem.word }
-
           it 'responds with Unprocessable Entity status' do
             expect(response).to have_http_status(:unprocessable_entity)
           end
@@ -78,7 +77,7 @@ describe Api::V1::NotesController, type: :controller do
           let!(:notes_custom) { create_list(:note, 2, user: user, note_type: type) }
           let(:notes_expected) { notes_custom }
 
-          it_behaves_like 'good responses'
+          it_behaves_like 'success index notes responses'
         end
       end
 
@@ -95,14 +94,14 @@ describe Api::V1::NotesController, type: :controller do
             let(:order) { 'asc' }
             let(:notes_expected) { user_notes_order_asc }
 
-            it_behaves_like 'good responses'
+            it_behaves_like 'success index notes responses'
           end
 
           context 'when is desc' do
             let(:order) { 'desc' }
             let(:notes_expected) { user_notes_order_asc.reverse }
 
-            it_behaves_like 'good responses'
+            it_behaves_like 'success index notes responses'
           end
         end
 
@@ -168,7 +167,14 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :show, params: { id: note.id } }
 
-        it_behaves_like 'good responses'
+        it 'responds with expected notes' do
+            expect(response_body.to_json).to eq(expected)
+          end
+        
+        it 'responds with 200 status' do
+            expect(response).to have_http_status(:ok)
+        end
+
       end
 
       context 'when fetching a invalid note' do
