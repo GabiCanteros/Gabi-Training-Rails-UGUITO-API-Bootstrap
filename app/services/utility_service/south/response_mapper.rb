@@ -6,8 +6,9 @@ module UtilityService
       end
 
       def retrieve_notes(_response_code, response_body)
-        { notes: map_books(response_body['notas']) }
+        { notes: map_notes(response_body['Notas']) }
       end
+
       private
 
       def map_books(books)
@@ -24,8 +25,43 @@ module UtilityService
         end
       end
 
+      def map_notes(notes)
+        notes.map do |note|
+          author_name = note['NombreCompletoAutor']
+          first_name, last_name = get_name_values(author_name)
+          {
+            title: note['TituloNota'],
+            type: get_note_type(note['ReseniaNota']),
+            created_at: note['FechaCreacionNota'],
+            content: note['Contenido'],
+            user: {
+              email: note['EmailAutor'],
+              first_name: first_name,
+              last_name: last_name
+            },
+            book: {
+              title: note['TituloLibro'],
+              author: note['NombreAutorLibro'],
+              genre: note['GeneroLibro']
+            }
+          }
+        end
+      end
 
-      
+      def get_name_values(full_name)
+        name_parts = get_array_name(full_name)
+        last_name = name_parts[0]
+        first_name = name_parts[1]
+        [first_name, last_name]
+      end
+
+      def get_array_name(full_name)
+        full_name.split(' ', 2)
+      end
+
+      def get_note_type(es_resenia)
+        es_resenia ? 'review' : 'critique'
+      end
     end
   end
 end

@@ -48,6 +48,7 @@ module UtilityService
         failed_response_method: :default_response
       )
     end
+
     private
 
     def build_utility_service_methods

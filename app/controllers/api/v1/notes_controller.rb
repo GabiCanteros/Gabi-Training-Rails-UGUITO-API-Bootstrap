@@ -16,10 +16,11 @@ module Api
         response = execute_async(RetrieveNotesWorker, current_user.id, index_async_params)
         async_custom_response(response)
       end
+
       private
 
       def index_async_params
-        { author: params.require(:author) } #chequear cuales son
+        { author: params.require(:author) }
       end
 
       def validate_order_param
@@ -74,4 +75,3 @@ module Api
     end
   end
 end
-
