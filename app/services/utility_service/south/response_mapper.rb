@@ -50,8 +50,8 @@ module UtilityService
 
       def get_name_values(full_name)
         name_parts = get_array_name(full_name)
-        last_name = name_parts[0]
-        first_name = name_parts[1]
+        last_name = name_parts.first
+        first_name = name_parts.second
         [first_name, last_name]
       end
 
