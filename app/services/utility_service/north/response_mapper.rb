@@ -27,10 +27,10 @@ module UtilityService
 
       def map_notes(notes)
         note_types = {
-          'opinion' => 'critique',
-          'critica' => 'critique',
-          'resenia' => 'review'
-        }
+          opinion: 'critique',
+          critica: 'critique',
+          resenia: 'review'
+        }.with_indifferent_access
         notes.map do |note|
           {
             title: note['titulo'],
