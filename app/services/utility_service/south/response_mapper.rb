@@ -59,8 +59,8 @@ module UtilityService
         full_name.split(' ', 2)
       end
 
-      def get_note_type(es_resenia)
-        es_resenia ? 'review' : 'critique'
+      def get_note_type(is_review)
+        is_review ? 'review' : 'critique'
       end
     end
   end

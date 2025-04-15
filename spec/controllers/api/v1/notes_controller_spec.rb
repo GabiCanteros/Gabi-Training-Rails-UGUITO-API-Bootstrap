@@ -8,7 +8,7 @@ describe Api::V1::NotesController, type: :controller do
       let(:author) { Faker::Book.author }
       let(:params) { { author: author } }
       let(:worker_name) { 'RetrieveNotesWorker' }
-      let(:parameters) { [user.id, params] }
+      let(:parameters) { [user.id, params.transform_keys(&:to_s)] }
 
       before { get :index_async, params: params }
 
