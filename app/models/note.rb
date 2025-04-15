@@ -24,9 +24,9 @@ class Note < ApplicationRecord
 
   def content_length
     case word_count
-    when 0..utility.max_word_short_content
+    when 0..max_word_short
       'short'
-    when (utility.max_word_short_content + 1)..utility.max_word_medium_content
+    when (max_word_short + 1)..max_word_medium
       'medium'
     else
       'long'
@@ -34,6 +34,14 @@ class Note < ApplicationRecord
   end
 
   private
+
+  def max_word_short
+    (utility.max_word_short_content || 0)
+  end
+
+  def max_word_medium
+    (utility.max_word_medium_content || 2)
+  end
 
   def validate_review_word_count
     return unless word_count > utility.max_word_valid_review
