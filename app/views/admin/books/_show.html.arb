@@ -5,10 +5,10 @@ panel 'Books' do
       book.id
     end
     row :utility do
-        Utility.find(book.utility_id)&.name
+      Utility.find(book.utility_id)&.name
     end
     row :user do
-        User.find(book.user_id)&.email
+      User.find(book.user_id)&.email
     end
     row :genre do
       book.genre
@@ -28,6 +28,5 @@ panel 'Books' do
     row :year do
       book.year
     end
-
   end
 end

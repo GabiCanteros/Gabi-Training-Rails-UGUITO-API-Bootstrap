@@ -1,12 +1,11 @@
-
 ActiveAdmin.register Book do
-  includes :utility 
+  includes :utility
   includes :user
 
   permit_params = %i[
     genre author image title publisher year user_id utility_id
   ]
-  
+
   member_action :copy, method: :get do
     @book = resource.dup
     render :new, layout: false
@@ -16,7 +15,6 @@ ActiveAdmin.register Book do
     link_to(I18n.t('active_admin.clone_model', model: 'Book'),
             copy_admin_book_path(id: resource.id))
   end
-
 
   controller do
     define_method :permitted_params do
@@ -41,9 +39,6 @@ ActiveAdmin.register Book do
     active_admin_comments
   end
 
-      
-
-
   form do |f|
     f.inputs 'Book Details', allow_destroy: true do
       f.semantic_errors(*f.object.errors.keys)
@@ -54,9 +49,8 @@ ActiveAdmin.register Book do
       f.input :image
       f.input :title
       f.input :publisher
-      f.input :year            
+      f.input :year
       f.actions
     end
   end
-end    
-
+end

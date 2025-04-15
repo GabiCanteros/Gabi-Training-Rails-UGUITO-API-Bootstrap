@@ -22,12 +22,12 @@ ActiveAdmin.register_page 'Dashboard' do
       table_for Book.order(code: :asc) do
         column('Title', &:title)
         column('Code', &:code)
-        column('Genre'&:genre)
-        column('Author'&:author)
-        column('Image'&:image)
-        column('Publisher'&:publisher)
-        column('Year'&:year)
-       
+        column('Genre' & :genre)
+        column('Author' & :author)
+        column('Image' & :image)
+        column('Publisher' & :publisher)
+        column('Year' & :year)
+
         column('Actions') do |book|
           buffer = link_to('Ver', send("admin_#{book.class.to_s.underscore}_path", book))
           buffer += ' '
@@ -38,7 +38,6 @@ ActiveAdmin.register_page 'Dashboard' do
         end
       end
     end
-
 
     # Here is an example of a simple dashboard with columns and panels.
     #
