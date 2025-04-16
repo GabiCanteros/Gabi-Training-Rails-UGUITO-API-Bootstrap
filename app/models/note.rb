@@ -22,11 +22,19 @@ class Note < ApplicationRecord
     content.split(/\s+/).size
   end
 
+  def short_limit
+    utility.max_word_short_content.presence&.to_i || 1
+  end
+
+  def medium_limit
+    utility.max_word_medium_content.presence&.to_i || short_limit + 2
+  end
+
   def content_length
     case word_count
-    when 0..utility.max_word_short_content
+    when 0..short_limit
       'short'
-    when (utility.max_word_short_content + 1)..utility.max_word_medium_content
+    when (short_limit + 1)..medium_limit
       'medium'
     else
       'long'

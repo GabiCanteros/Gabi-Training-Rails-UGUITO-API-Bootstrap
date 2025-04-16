@@ -28,7 +28,7 @@ class Utility < ApplicationRecord
   validates :name, :type, presence: true
 
   store_accessor :integration_urls, :external_api_authentication_url, :books_data_url,
-                 :notes_data_url
+                 :notes_data_url, :max_word_short_content, :max_word_medium_content
 
   def generate_entity_code
     return if code.present? && !code.to_i.zero?

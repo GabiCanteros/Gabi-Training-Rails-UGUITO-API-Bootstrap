@@ -31,8 +31,8 @@ RSpec.describe Note, type: :model do
   end
 
   describe 'content_length' do
-    let(:south_utility) { create(:south_utility) }
-    let(:north_utility) { create(:north_utility) }
+    let(:south_utility) { create(:south_utility, max_word_short_content: 60, max_word_medium_content: 120) }
+    let(:north_utility) { create(:north_utility, max_word_short_content: 50, max_word_medium_content: 100) }
     let(:user_south) { create(:user, utility: south_utility) }
     let(:user_north) { create(:user, utility: north_utility) }
 
@@ -74,8 +74,8 @@ RSpec.describe Note, type: :model do
   end
 
   describe 'validate_review_word_count' do
-    let(:south_utility) { create(:south_utility) }
-    let(:north_utility) { create(:north_utility) }
+    let(:south_utility) { create(:south_utility, max_word_short_content: 60, max_word_medium_content: 120) }
+    let(:north_utility) { create(:north_utility, max_word_short_content: 50, max_word_medium_content: 100) }
     let(:user_south) { create(:user, utility: south_utility) }
     let(:user_north) { create(:user, utility: north_utility) }
 
