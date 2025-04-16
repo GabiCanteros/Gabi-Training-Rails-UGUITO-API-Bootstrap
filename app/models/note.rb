@@ -23,11 +23,11 @@ class Note < ApplicationRecord
   end
 
   def short_limit
-    [utility.max_word_short_content.to_i, 1].max
+    utility.max_word_short_content.presence&.to_i || 1
   end
 
   def medium_limit
-    [utility.max_word_medium_content.to_i, short_limit + 2].max
+    utility.max_word_medium_content.presence&.to_i || short_limit + 2
   end
 
   def content_length
