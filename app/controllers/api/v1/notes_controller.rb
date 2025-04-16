@@ -12,12 +12,22 @@ module Api
         render json: show_note, status: :ok
       end
 
+      def index_async
+        response = execute_async(RetrieveNotesWorker, current_user.id, index_async_params.to_h)
+        async_custom_response(response)
+      end
+
       private
+
+      def index_async_params
+        params.require(:author)
+        params.permit(:author)
+      end
 
       def validate_order_param
         return unless order.present? && !%w[asc desc].include?(order)
         render json: { error:
-        I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_order_param') },
+        I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_order_param')},
                status: :unprocessable_entity
       end
 

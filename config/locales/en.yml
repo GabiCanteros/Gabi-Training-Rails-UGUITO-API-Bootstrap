@@ -48,3 +48,4 @@ en:
           content:
             review_word_count: "Review content cannot exceed %{max_word_limit} words."
 
+

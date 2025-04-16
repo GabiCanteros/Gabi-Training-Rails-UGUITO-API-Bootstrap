@@ -47,4 +47,4 @@ es:
         attributes:
           content:
             review_word_count: "Una reseña no puede superar las %{max_word_limit} palabras."
-            
+
