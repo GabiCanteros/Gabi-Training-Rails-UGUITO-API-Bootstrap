@@ -22,11 +22,19 @@ class Note < ApplicationRecord
     content.split(/\s+/).size
   end
 
+  def short_limit
+    [utility.max_word_short_content.to_i, 1].max
+  end
+
+  def medium_limit
+    [utility.max_word_medium_content.to_i, short_limit + 2].max
+  end
+
   def content_length
     case word_count
-    when 0..max_word_short
+    when 0..short_limit
       'short'
-    when (max_word_short + 1)..max_word_medium
+    when (short_limit + 1)..medium_limit
       'medium'
     else
       'long'
@@ -34,14 +42,6 @@ class Note < ApplicationRecord
   end
 
   private
-
-  def max_word_short
-    (utility.max_word_short_content || 0)
-  end
-
-  def max_word_medium
-    (utility.max_word_medium_content || 2)
-  end
 
   def validate_review_word_count
     return unless word_count > utility.max_word_valid_review
