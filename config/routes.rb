@@ -13,11 +13,13 @@ Rails.application.routes.draw do
                         sessions: 'api/v1/users/sessions',
                         registrations: 'api/v1/users/registrations'
                        }
+
     resources :notes, only: %i[index show] do
       collection do
       get :async, to: 'notes#index_async'
       end
     end  
+
     resources :books, only: %i[index show] do
       collection do
         get :async, to: 'books#index_async'
