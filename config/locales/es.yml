@@ -49,3 +49,4 @@ es:
             params_missing: "Faltan parametros requeridos."
             invalid_note_type: "El tipo de nota no es válido."
             success_note_create: "Nota creada con éxito"
+

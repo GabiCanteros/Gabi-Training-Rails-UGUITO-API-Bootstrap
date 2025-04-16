@@ -38,7 +38,7 @@ class Note < ApplicationRecord
   def validate_review_word_count
     return unless word_count > utility.max_word_valid_review
     errors.add(:content,
-               I18n.t('activerecord.errors.models.note.attributes.content.review_word_count',
+               I18n.t('activerecord.models.note.attributes.content.review_word_count',
                       max_word_limit: utility.max_word_valid_review))
   end
   has_one :utility, through: :user

@@ -1,0 +1,32 @@
+panel 'Books' do
+  attributes_table_for book do
+    book = locals[:book]
+    row :book_code do
+      book.id
+    end
+    row :utility do
+      Utility.find(book.utility_id)&.name
+    end
+    row :user do
+      User.find(book.user_id)&.email
+    end
+    row :genre do
+      book.genre
+    end
+    row :author do
+      book.author
+    end
+    row :image do
+      book.image
+    end
+    row :title do
+      book.title
+    end
+    row :publisher do
+      book.publisher
+    end
+    row :year do
+      book.year
+    end
+  end
+end

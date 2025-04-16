@@ -12,14 +12,15 @@ describe Api::V1::NotesController, type: :controller do
                                                           serializer: IndexNoteSerializer).to_json
       end
       let(:notes_expected) { user_notes }
-      let(:page) { 1 }
-      let(:page_size) { 50 }
+
 
       context 'when page and page_size are params' do
         before { get :index, params: { page: page, page_size: page_size } }
 
         context 'when fetching all the notes for user' do
-          it_behaves_like 'good responses'
+          let(:page) { 1 }
+          let(:page_size) { 50 }
+          it_behaves_like 'success index notes responses'
         end
 
         context 'when page is invalid' do
@@ -78,7 +79,7 @@ describe Api::V1::NotesController, type: :controller do
           let!(:notes_custom) { create_list(:note, 2, user: user, note_type: type) }
           let(:notes_expected) { notes_custom }
 
-          it_behaves_like 'good responses'
+          it_behaves_like 'success index notes responses'
         end
       end
 
@@ -95,14 +96,14 @@ describe Api::V1::NotesController, type: :controller do
             let(:order) { 'asc' }
             let(:notes_expected) { user_notes_order_asc }
 
-            it_behaves_like 'good responses'
+            it_behaves_like 'success index notes responses'
           end
 
           context 'when is desc' do
             let(:order) { 'desc' }
             let(:notes_expected) { user_notes_order_asc.reverse }
 
-            it_behaves_like 'good responses'
+            it_behaves_like 'success index notes responses'
           end
         end
 
@@ -168,7 +169,14 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :show, params: { id: note.id } }
 
-        it_behaves_like 'good responses'
+
+        it 'responds with expected notes' do
+          expect(response_body.to_json).to eq(expected)
+        end
+
+        it 'responds with 200 status' do
+          expect(response).to have_http_status(:ok)
+        end
       end
 
       context 'when fetching a invalid note' do
@@ -255,6 +263,47 @@ describe Api::V1::NotesController, type: :controller do
       before { post :create, params: { note: { title: Faker::Lorem.sentence(word_count: 3), type: 'review', content: Faker::Lorem.sentence(word_count: 10) } } }
 
       it_behaves_like 'unauthorized'
+    end
+  end  
+
+  describe 'GET #index_async' do
+    context 'when the user is authenticated' do
+      include_context 'with authenticated user'
+
+      let(:author) { Faker::Book.author }
+      let(:params) { { author: author } }
+      let(:worker_name) { 'RetrieveNotesWorker' }
+      let(:parameters) { [user.id, params.transform_keys(&:to_s)] }
+
+      before { get :index_async, params: params }
+
+      it 'returns status code accepted' do
+        expect(response).to have_http_status(:accepted)
+      end
+
+      it 'returns the response id and url to retrive the data later' do
+        expect(response_body.keys).to contain_exactly('response', 'job_id', 'url')
+      end
+
+      it 'enqueues a job' do
+        expect(AsyncRequest::JobProcessor.jobs.size).to eq(1)
+      end
+
+      it 'creates the right job' do
+        expect(AsyncRequest::Job.last.worker).to eq(worker_name)
+      end
+
+      it 'creates a job with given parameters' do
+        expect(AsyncRequest::Job.last.params).to eq(parameters)
+      end
+    end
+
+    context 'when the user is not authenticated' do
+      before { get :index_async }
+
+      it 'returns status code unauthorized' do
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 end
