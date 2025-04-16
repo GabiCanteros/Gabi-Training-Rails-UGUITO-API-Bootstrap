@@ -16,7 +16,8 @@ module Api
 
       def validate_order_param
         return unless order.present? && !%w[asc desc].include?(order)
-        render json: { error: I18n.t('errors.invalid_order_param') },
+        render json: { error:
+        I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_order_param') },
                status: :unprocessable_entity
       end
 
@@ -27,7 +28,8 @@ module Api
       end
 
       def render_page_error
-        render json: { error: I18n.t('errors.invalid_page_param') },
+        render json: { error:
+        I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param') },
                status: :unprocessable_entity
       end
 

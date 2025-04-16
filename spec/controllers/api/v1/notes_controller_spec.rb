@@ -12,13 +12,14 @@ describe Api::V1::NotesController, type: :controller do
                                                           serializer: IndexNoteSerializer).to_json
       end
       let(:notes_expected) { user_notes }
-      let(:page) { 1 }
-      let(:page_size) { 50 }
 
       context 'when page and page_size are params' do
         before { get :index, params: { page: page, page_size: page_size } }
 
         context 'when fetching all the notes for user' do
+          let(:page) { 1 }
+          let(:page_size) { 50 }
+
           it_behaves_like 'success index notes responses'
         end
 
@@ -31,19 +32,20 @@ describe Api::V1::NotesController, type: :controller do
           end
 
           it 'responds with an error message for invalid page' do
-            expect(response.body).to include(I18n.t('errors.invalid_page_param'))
+            expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
           end
         end
 
         context 'when page_size is invalid' do
           let(:page) { 1 }
           let(:page_size) { Faker::Lorem.word }
+
           it 'responds with Unprocessable Entity status' do
             expect(response).to have_http_status(:unprocessable_entity)
           end
 
           it 'responds with an error message for invalid page_size' do
-            expect(response.body).to include(I18n.t('errors.invalid_page_param'))
+            expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
           end
         end
 
@@ -113,7 +115,7 @@ describe Api::V1::NotesController, type: :controller do
           end
 
           it 'responds with a correct error message' do
-            expect(response.body).to include(I18n.t('errors.invalid_order_param'))
+            expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_order_param'))
           end
         end
       end
@@ -128,7 +130,7 @@ describe Api::V1::NotesController, type: :controller do
         end
 
         it 'responds with an error message for invalid page_size' do
-          expect(response.body).to include('Página o tamaño de página inválidos o no presentes. Usa un número entero positivo.')
+          expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
         end
       end
 
@@ -142,7 +144,7 @@ describe Api::V1::NotesController, type: :controller do
         end
 
         it 'responds with an error message for invalid page_size' do
-          expect(response.body).to include('Página o tamaño de página inválidos o no presentes. Usa un número entero positivo.')
+          expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
         end
       end
     end
@@ -168,13 +170,12 @@ describe Api::V1::NotesController, type: :controller do
         before { get :show, params: { id: note.id } }
 
         it 'responds with expected notes' do
-            expect(response_body.to_json).to eq(expected)
-          end
-        
-        it 'responds with 200 status' do
-            expect(response).to have_http_status(:ok)
+          expect(response_body.to_json).to eq(expected)
         end
 
+        it 'responds with 200 status' do
+          expect(response).to have_http_status(:ok)
+        end
       end
 
       context 'when fetching a invalid note' do
