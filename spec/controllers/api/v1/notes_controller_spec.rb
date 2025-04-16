@@ -13,13 +13,13 @@ describe Api::V1::NotesController, type: :controller do
       end
       let(:notes_expected) { user_notes }
 
-
       context 'when page and page_size are params' do
         before { get :index, params: { page: page, page_size: page_size } }
 
         context 'when fetching all the notes for user' do
           let(:page) { 1 }
           let(:page_size) { 50 }
+
           it_behaves_like 'success index notes responses'
         end
 
@@ -169,7 +169,6 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :show, params: { id: note.id } }
 
-
         it 'responds with expected notes' do
           expect(response_body.to_json).to eq(expected)
         end
@@ -265,6 +264,7 @@ describe Api::V1::NotesController, type: :controller do
       it_behaves_like 'unauthorized'
     end
   end  
+
 
   describe 'GET #index_async' do
     context 'when the user is authenticated' do

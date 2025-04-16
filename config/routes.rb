@@ -14,6 +14,7 @@ Rails.application.routes.draw do
                         registrations: 'api/v1/users/registrations'
                        }
 
+
     resources :notes, only: %i[index show create] do
       collection do
       get :async, to: 'notes#index_async'
