@@ -2,9 +2,16 @@ class ApplicationController < ActionController::Base
   include AsyncRequestManager
   include ExceptionHandler
   include ParamsHandler
+  rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
+  rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
+  rescue_from ArgumentError, with: :handle_argument_error
   protect_from_forgery with: :null_session
   skip_before_action :verify_authenticity_token
   before_action :configure_permitted_parameters, if: :devise_controller?
+
+  def handle_error_message_without_attribute(message)
+    message.record.errors.full_messages.map { |msg| msg.split(' ', 2).last }.join(', ')
+  end
 
   private
 

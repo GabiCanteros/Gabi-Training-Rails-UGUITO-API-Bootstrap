@@ -263,8 +263,7 @@ describe Api::V1::NotesController, type: :controller do
 
       it_behaves_like 'unauthorized'
     end
-  end  
-
+  end
 
   describe 'GET #index_async' do
     context 'when the user is authenticated' do

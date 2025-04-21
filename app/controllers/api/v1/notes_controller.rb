@@ -3,9 +3,6 @@ module Api
     class NotesController < ApplicationController
       before_action :authenticate_user!
       before_action :validate_order_param, :validate_page_params, only: [:index]
-      rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
-      rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
-      rescue_from ArgumentError, with: :handle_argument_error
 
       def index
         render json: notes_filtered, status: :ok, each_serializer: IndexNoteSerializer
@@ -15,7 +12,6 @@ module Api
         render json: show_note, status: :ok
       end
 
-
       def create
         params_transformed
         current_user.notes.create!(note_params)
@@ -23,7 +19,7 @@ module Api
               I18n.t('controllers.errors.api.v1.notes_controller.success_note_create') },
                status: :created
       end
-      
+
       def index_async
         response = execute_async(RetrieveNotesWorker, current_user.id, index_async_params.to_h)
         async_custom_response(response)
@@ -32,12 +28,8 @@ module Api
       private
 
       def handle_record_invalid(exception)
-        error_messages = remake_error_message(exception)
+        error_messages = handle_error_message_without_attribute(exception)
         render json: { error: error_messages }, status: :unprocessable_entity
-      end
-
-      def remake_error_message(message)
-        message.record.errors.full_messages.map { |msg| msg.split(' ', 2).last }.join(', ')
       end
 
       def handle_parameter_missing(_exception)
@@ -63,7 +55,7 @@ module Api
         params.require(:note).require(%i[title note_type content])
         params.require(:note).permit(%i[title note_type content])
       end
-      
+
       def index_async_params
         params.require(:author)
         params.permit(:author)
