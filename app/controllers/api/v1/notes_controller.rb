@@ -12,12 +12,49 @@ module Api
         render json: show_note, status: :ok
       end
 
+      def create
+        params_transformed
+        current_user.notes.create!(note_params)
+        render json: { message:
+              I18n.t('controllers.errors.api.v1.notes_controller.success_note_create') },
+               status: :created
+      end
+
       def index_async
         response = execute_async(RetrieveNotesWorker, current_user.id, index_async_params.to_h)
         async_custom_response(response)
       end
 
       private
+
+      def handle_record_invalid(exception)
+        error_messages = handle_error_message_without_attribute(exception)
+        render json: { error: error_messages }, status: :unprocessable_entity
+      end
+
+      def handle_parameter_missing(_exception)
+        render json: { error:
+              I18n.t('controllers.errors.api.v1.notes_controller.params_missing') },
+               status: :bad_request
+      end
+
+      def handle_argument_error(_exception)
+        render json: { error:
+              I18n.t('controllers.errors.api.v1.notes_controller.invalid_note_type') },
+               status: :unprocessable_entity
+      end
+
+      def params_transformed
+        param_mapping = { 'type' => 'note_type' }
+        params.deep_transform_keys! do |key|
+          param_mapping[key.to_s] || key
+        end
+      end
+
+      def note_params
+        params.require(:note).require(%i[title note_type content])
+        params.require(:note).permit(%i[title note_type content])
+      end
 
       def index_async_params
         params.require(:author)
@@ -27,19 +64,22 @@ module Api
       def validate_order_param
         return unless order.present? && !%w[asc desc].include?(order)
         render json: { error:
-        I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_order_param')},
+        I18n.t('controllers.errors.api.v1.notes_controller.invalid_order_param') },
                status: :unprocessable_entity
+      end
+
+      def order
+        @order ||= params[:order] || 'asc'
       end
 
       def validate_page_params
         return render_page_error unless params[:page].present? && valid_number?(params[:page])
-
         render_page_error unless params[:page_size].present? && valid_number?(params[:page_size])
       end
 
       def render_page_error
         render json: { error:
-        I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param') },
+        I18n.t('controllers.errors.api.v1.notes_controller.invalid_page_param') },
                status: :unprocessable_entity
       end
 
@@ -54,25 +94,16 @@ module Api
              .per(params[:page_size])
       end
 
-      def notes
-        current_user.notes
-      end
-
       def filtering_params
         params_transformed.permit(%i[note_type title])
       end
 
-      def params_transformed
-        param_mapping = { 'type' => 'note_type' }
-        params.transform_keys! { |key| param_mapping[key] || key }
-      end
-
-      def order
-        @order ||= params[:order] || 'asc'
-      end
-
       def show_note
         notes.find(params.require(:id))
+      end
+
+      def notes
+        current_user.notes
       end
     end
   end

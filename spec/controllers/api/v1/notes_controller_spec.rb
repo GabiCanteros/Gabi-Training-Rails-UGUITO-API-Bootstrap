@@ -32,7 +32,7 @@ describe Api::V1::NotesController, type: :controller do
           end
 
           it 'responds with an error message for invalid page' do
-            expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
+            expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.invalid_page_param'))
           end
         end
 
@@ -45,7 +45,7 @@ describe Api::V1::NotesController, type: :controller do
           end
 
           it 'responds with an error message for invalid page_size' do
-            expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
+            expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.invalid_page_param'))
           end
         end
 
@@ -115,7 +115,7 @@ describe Api::V1::NotesController, type: :controller do
           end
 
           it 'responds with a correct error message' do
-            expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_order_param'))
+            expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.invalid_order_param'))
           end
         end
       end
@@ -129,8 +129,8 @@ describe Api::V1::NotesController, type: :controller do
           expect(response).to have_http_status(:unprocessable_entity)
         end
 
-        it 'responds with an error message for invalid page_size' do
-          expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
+        it 'responds with an error message for invalid page' do
+          expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.invalid_page_param'))
         end
       end
 
@@ -144,7 +144,7 @@ describe Api::V1::NotesController, type: :controller do
         end
 
         it 'responds with an error message for invalid page_size' do
-          expect(response.body).to include(I18n.t('activerecord.controllers.errors.api.v1.notes_controller.invalid_page_param'))
+          expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.invalid_page_param'))
         end
       end
     end
@@ -192,6 +192,78 @@ describe Api::V1::NotesController, type: :controller do
         before { get :show, params: { id: Faker::Number.number } }
 
         it_behaves_like 'unauthorized'
+      end
+    end
+  end
+
+  describe 'POST #create' do
+    context 'when there is a user logged in' do
+      include_context 'with authenticated user'
+
+      context 'when title, type and content are present' do
+        before { post :create, params: attributes }
+
+        context 'when a note is created with valid params' do
+          let(:attributes) { { note: { title: Faker::Lorem.sentence(word_count: 3), type: 'review', content: Faker::Lorem.sentence(word_count: 10) } } }
+
+          it 'add a raw in the Note table' do
+            expect(Note.count).to eq(1)
+          end
+
+          it 'responds with 200 status' do
+            expect(response).to have_http_status(:created)
+          end
+
+          it 'respond with a success message' do
+            expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.success_note_create'))
+          end
+        end
+
+        context 'when note type is not valid' do
+          let(:attributes) { { note: { title: Faker::Lorem.sentence(word_count: 3), type: 'sinapsis', content: Faker::Lorem.sentence(word_count: 10) } } }
+
+          it 'responds with Unprocessable Entity status' do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'responds with an error message for an invalid note type' do
+            expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.invalid_note_type'))
+          end
+        end
+
+        context 'when content length is not valid' do
+          let(:attributes) { { note: { title: Faker::Lorem.sentence(word_count: 3), type: 'review', content: 'word ' * 61 } } }
+
+          it 'responds with Unprocessable Entity status' do
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          it 'responds with an error message for an invalid content length' do
+            expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.review_word_count',
+                                                    max_word_limit: user.utility.max_word_valid_review))
+          end
+        end
+      end
+
+      context 'when required params are missing' do
+        before { post :create, params: { note: { title: Faker::Lorem.sentence(word_count: 3), type: 'review' } } }
+
+        it 'responds with Bad Request status' do
+          expect(response).to have_http_status(:bad_request)
+        end
+
+        it 'responds with an error message for params missing' do
+          expect(response.body).to include(I18n.t('controllers.errors.api.v1.notes_controller.params_missing'))
+        end
+      end
+    end
+
+    context 'when there is not a user logged in' do
+      before { post :create, params: { note: { title: Faker::Lorem.sentence(word_count: 3), type: 'review', content: Faker::Lorem.sentence(word_count: 10) } } }
+
+      it_behaves_like 'unauthorized'
+    end
+  end
 
   describe 'GET #index_async' do
     context 'when the user is authenticated' do
